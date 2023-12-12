@@ -16,6 +16,7 @@ from keras.models import Sequential
 from keras.models import Model
 from chordlyrics import chordlyrics
 from songtranspose import songtranspose
+import matplotlib.pyplot as plt
 
 def hmmsetup():
     nchords = helpers.nchords # n_components
@@ -59,6 +60,13 @@ def cqtextraction(songpath, sr, hopsize):
             n_bins=84, bins_per_octave=12, tuning=0.0, filter_scale=1,
             norm=1, sparsity=0.01, window='hann', scale=True)
     cqtspec = numpy.transpose(cqtspec) # transpose for interfacing with the hmm
+    plt.figure(figsize=(10, 4))
+    librosa.display.specshow(librosa.amplitude_to_db(cqtspec, ref=np.max),
+                             sr=sr, hop_length=hopsize, x_axis='time', y_axis='cqt_note')
+    plt.colorbar(format='%+2.0f dB')
+    plt.title('Constant-Q power spectrum')
+    plt.tight_layout()
+    plt.show()
 
     return cqtspec
 
@@ -72,7 +80,12 @@ def chromagramextraction(songpath, sr, hopsize):
                                             tuning=None, n_chroma=12, n_octaves=7, window=None,
                                             bins_per_octave=None, cqt_mode='full')
     chromagram = numpy.transpose(chromagram)  # transpose for interfacing with the hmm
-
+    # plt.figure(figsize=(10, 4))
+    # librosa.display.specshow(chromagram, y_axis='chroma', x_axis='time')
+    # plt.colorbar()
+    # plt.title('Chromagram')
+    # plt.tight_layout()
+    # plt.show()
     return chromagram
 
 def segmentation(chords, framedur):
@@ -90,7 +103,17 @@ def segmentation(chords, framedur):
             segments.append((st,et))
             st = et
         ochord = nchord
-
+    # # Visualize Segmentation
+    # for seg in segments:
+    #     start_time, end_time, chord = seg
+    #     plt.axvline(x=start_time, color='r')  # Start of segment
+    #     plt.axvline(x=end_time, color='b')  # End of segment
+    #     plt.text((start_time+end_time)/2, 1, chord, color='green', fontsize=12)
+    
+    # plt.title('Segmentation')
+    # plt.xlabel('Time (s)')
+    # plt.ylabel('Chord')
+    # plt.show()
     return segments
 
 def writeres(chords, framedur, respath):

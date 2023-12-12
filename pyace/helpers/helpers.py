@@ -81,8 +81,8 @@ def chordname2chordnum(chord):
 	return chordnum, rootnum
 
 def segtile(numtile, ingram, st, et, framedur):
-	sf = long(st / framedur)  # as number of frames
-	ef = long(et / framedur)  # as number of frames
+	sf = int(st / framedur)  # as number of frames
+	ef = int(et / framedur)  # as number of frames
 	feature = numpy.zeros((numtile, ingram.shape[1]))
 	buf = ingram[sf:ef]
 	lenseg = ef - sf + 1
